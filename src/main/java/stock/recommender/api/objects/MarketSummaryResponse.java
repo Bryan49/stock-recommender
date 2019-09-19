@@ -1,12 +1,15 @@
 package stock.recommender.api.objects;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarketExchangeSummaryResponse {
+@JsonRootName(value = "marketSummaryResponse")
+public class MarketSummaryResponse {
     List<MarketExchangeSummary> result;
 
-    public MarketExchangeSummaryResponse() {
+    public MarketSummaryResponse() {
         this.result = new ArrayList<>();
     }
 

@@ -1,10 +1,12 @@
 package stock.recommender.api.objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class MarketExchangeSummary {
     @JsonProperty("fullExchangeName")
     private String exchangeName;
@@ -13,7 +15,7 @@ public class MarketExchangeSummary {
     private String timeZone;
 
     @JsonProperty("regularMarketPrice")
-    private Map<String, Integer> marketPrice;
+    private Float marketPrice;
     private String shortName;
     private String region;
 
@@ -22,7 +24,7 @@ public class MarketExchangeSummary {
         this.timeZone = "";
         this.shortName = "";
         this.region = "";
-        this.marketPrice = new HashMap<>();
+        this.marketPrice = 0F;
     }
 
     public String getExchangeName() {
@@ -57,11 +59,11 @@ public class MarketExchangeSummary {
         this.region = region;
     }
 
-    public Map<String, Integer> getMarketPrice() {
+    public Float getMarketPrice() {
         return marketPrice;
     }
 
-    public void setMarketPrice(Map<String, Integer> marketPrice) {
-        this.marketPrice = marketPrice;
+    public void setMarketPrice(Map<String, String> marketPrice) {
+        if (marketPrice.containsKey("raw")) this.marketPrice = Float.valueOf(marketPrice.get("raw"));
     }
 }
