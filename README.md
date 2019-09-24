@@ -15,6 +15,8 @@ Welcome to my stock recommender Java project! The final vision is still tbd.
 
 [In Progress] Caffeine caches that store recent stock data
 
+Implement Spring config files to be able to read in local configs
+
 Service that allows you to bundle together stocks and see how much you would've made
 
 Stock that clusters together stocks by industry and recommends ones;

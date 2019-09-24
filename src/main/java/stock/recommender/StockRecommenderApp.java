@@ -1,6 +1,8 @@
 package stock.recommender;
 
 import stock.recommender.api.MockData;
+import stock.recommender.api.MockYahooApi;
+import stock.recommender.api.StockApi;
 import stock.recommender.api.YahooApi;
 import stock.recommender.api.objects.MarketExchangeSummary;
 import stock.recommender.pojo.StockRecommenderException;
@@ -18,7 +20,7 @@ public class StockRecommenderApp {
 
         String mainMenuOption, marketMenuOption;
         Boolean usingRealData;
-        YahooApi yahooApi;
+        StockApi stockApi;
 
         Optional<String> apiKey;
         MockData mockData;
@@ -33,22 +35,19 @@ public class StockRecommenderApp {
                 if (TextUtil.isEmptyOrWhitespace(apiKey.get())) {
                     apiKey = Optional.of("2f074e7960msh5c02c30f816b308p1cc202jsn78140027bb50");
                     logger.info("Api key to default one");
-                    break;
                 } else {
                     logger.info("Testing api key...");
-                    yahooApi = new YahooApi(apiKey.get());
-
-
-                    if (yahooApi.testApiKey()) {
-                        logger.info("Successfully validated api key");
-                        break;
-                    } else {
-                        logger.warning("Failed to validate api key, try again...");
-                        continue;
-                    }
+                }
+                stockApi = new YahooApi(apiKey.get());
+                if (stockApi.testConnection()) {
+                    logger.info("Successfully validated api key");
+                    break;
+                } else {
+                    logger.warning("Failed to validate api key, try again...");
+                    continue;
                 }
             } else {
-                apiKey = Optional.empty();
+                stockApi = new MockYahooApi();
                 logger.info("Using mock data");
                 break;
             }
@@ -60,29 +59,17 @@ public class StockRecommenderApp {
                 while (true) {
                     marketMenuOption = queryForInput("What would you like to do?\n1) Get summary\n2) Get movers\n3) Go back", threeOptions);
                     if (marketMenuOption.equals("1")) {
-                        List<MarketExchangeSummary> summaries;
-                        if (apiKey.isPresent()) {
-                            try {
-                                yahooApi = new YahooApi(apiKey.get());
-                                summaries = yahooApi.getMarketSummary();
-                            } catch (StockRecommenderException e) {
-                                logger.warning("Error when getting market summary: " + e.getMessage());
-                                continue;
+                        try {
+                            List<MarketExchangeSummary> summaries = stockApi.getMarketSummary();
+
+                            for (MarketExchangeSummary summary : summaries) {
+                                System.out.println(summary.getExchangeName());
+                                System.out.println("\t-" + summary.getRegion());
+                                System.out.println("\t-" + summary.getTimeZone());
+                                System.out.println("\t-$" + summary.getMarketPrice() + "\n");
                             }
-                        } else {
-                            try {
-                                mockData = new MockData();
-                                summaries = mockData.getMarketExchangeSummaries();
-                            } catch (StockRecommenderException e) {
-                               logger.warning("Error when getting mock market summary: " + e.getMessage());
-                                continue;
-                            }
-                        }
-                        for (MarketExchangeSummary summary : summaries) {
-                            System.out.println(summary.getExchangeName());
-                            System.out.println("\t-" + summary.getRegion());
-                            System.out.println("\t-" + summary.getTimeZone());
-                            System.out.println("\t-$" + summary.getMarketPrice() + "\n");
+                        } catch (StockRecommenderException e) {
+                            logger.warning("Failed to get market summaries. " + e.getMessage());
                         }
                     } else if (marketMenuOption.equals("2")) {
                         logger.info("Feature not supported. Please try again later");

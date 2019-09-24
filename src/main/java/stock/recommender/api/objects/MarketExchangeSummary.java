@@ -16,13 +16,14 @@ public class MarketExchangeSummary {
 
     @JsonProperty("regularMarketPrice")
     private Float marketPrice;
-    private String shortName;
+    @JsonProperty("exchange")
+    private String symbol;
     private String region;
 
     public MarketExchangeSummary() {
         this.exchangeName = "";
         this.timeZone = "";
-        this.shortName = "";
+        this.symbol = "";
         this.region = "";
         this.marketPrice = 0F;
     }
@@ -31,39 +32,44 @@ public class MarketExchangeSummary {
         return exchangeName;
     }
 
-    public void setExchangeName(String exchangeName) {
+    public MarketExchangeSummary setExchangeName(String exchangeName) {
         this.exchangeName = exchangeName;
+        return this;
     }
 
     public String getTimeZone() {
         return timeZone;
     }
 
-    public void setTimeZone(String timeZone) {
+    public MarketExchangeSummary setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+        return this;
     }
 
-    public String getShortName() {
-        return shortName;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public MarketExchangeSummary setSymbol(String symbol) {
+        this.symbol = symbol;
+        return this;
     }
 
     public String getRegion() {
         return region;
     }
 
-    public void setRegion(String region) {
+    public MarketExchangeSummary setRegion(String region) {
         this.region = region;
+        return this;
     }
 
     public Float getMarketPrice() {
         return marketPrice;
     }
 
-    public void setMarketPrice(Map<String, String> marketPrice) {
+    public MarketExchangeSummary setMarketPrice(Map<String, String> marketPrice) {
         if (marketPrice.containsKey("raw")) this.marketPrice = Float.valueOf(marketPrice.get("raw"));
+        return this;
     }
 }

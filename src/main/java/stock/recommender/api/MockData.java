@@ -1,21 +1,11 @@
 package stock.recommender.api;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import stock.recommender.api.YahooApi;
-import stock.recommender.api.objects.MarketExchangeSummary;
-import stock.recommender.api.objects.MarketSummaryResponse;
-import stock.recommender.pojo.StockRecommenderException;
-
-import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class MockData {
     static Logger logger = Logger.getLogger("stock.recommender.api.MockData");
 
-    private String marketSummaryResponse = "{\"marketSummaryResponse\":{\"result\":[{\"exchangeTimezoneName\":\"America/New_York\"," +
+    public static String marketSummaryResponse = "{\"marketSummaryResponse\":{\"result\":[{\"exchangeTimezoneName\":\"America/New_York\"," +
             "\"fullExchangeName\":\"SNP\",\"symbol\":\"^GSPC\",\"regularMarketChange\":{\"raw\":-14.719971,\"fmt\":\"-14.72\"}," +
             "\"gmtOffSetMilliseconds\":-14400000,\"exchangeDataDelayedBy\":0,\"language\":\"en\"," +
             "\"regularMarketTime\":{\"raw\":1569014142,\"fmt\":\"5:15PM EDT\"},\"exchangeTimezoneShortName\":\"EDT\"," +
@@ -111,27 +101,4 @@ public class MockData {
             "{\"raw\":22079.09,\"fmt\":\"22,079.09\"},\"market\":\"jp_market\",\"priceHint\":2,\"tradeable\":false," +
             "\"sourceInterval\":20,\"exchange\":\"OSA\",\"shortName\":\"Nikkei 225\",\"region\":\"US\",\"triggerable\":false," +
             "\"regularMarketPreviousClose\":{\"raw\":22044.4,\"fmt\":\"22,044.40\"}}],\"error\":null}}";
-    ObjectMapper objectMapper;
-    YahooApi yahooApi;
-    List<MarketExchangeSummary> marketExchangeSummaries;
-
-    public MockData () throws StockRecommenderException {
-        try {
-            this.objectMapper = new ObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true)
-                    .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-            this.yahooApi = new YahooApi("2f074e7960msh5c02c30f816b308p1cc202jsn78140027bb50");
-            this.marketExchangeSummaries = this.objectMapper.readValue(marketSummaryResponse, MarketSummaryResponse.class).getResult();
-        } catch (IOException e) {
-            //Should never happen
-            throw new StockRecommenderException("Couldn't deserialize mock market summary data");
-        }
-    }
-
-    public List<MarketExchangeSummary> getMarketExchangeSummaries() {
-        return marketExchangeSummaries;
-    }
-
-
 }

@@ -14,9 +14,12 @@ import stock.recommender.pojo.StockRecommenderException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-public class YahooApi {
+public class YahooApi implements StockApi {
     static Logger logger = Logger.getLogger("YahooApi");
     ObjectMapper objectMapper;
 
@@ -34,7 +37,7 @@ public class YahooApi {
         this.apiKey = apiKey;
     }
 
-    public boolean testApiKey() {
+    public boolean testConnection() {
         try {
             HttpResponse<String> response = Unirest.get("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-summary?region=US&lang=en")
                     .header("x-rapidapi-host", "apidojo-yahoo-finance-v1.p.rapidapi.com")
@@ -69,5 +72,9 @@ public class YahooApi {
             logger.severe("Failed to successfully call api: " + e.getMessage());
             throw new StockRecommenderException("Failed to get successful response from api. Check logs for details.");
         }
+    }
+
+    public Map<String, MarketExchangeSummary> getMarketSummaryBySymbol() throws StockRecommenderException {
+        return getMarketSummary().stream().collect(Collectors.toMap(MarketExchangeSummary::getSymbol, Function.identity()));
     }
 }
