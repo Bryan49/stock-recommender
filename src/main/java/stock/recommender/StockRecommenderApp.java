@@ -1,11 +1,7 @@
 package stock.recommender;
 
-import stock.recommender.api.MockData;
-import stock.recommender.api.MockYahooApi;
-import stock.recommender.api.StockApi;
-import stock.recommender.api.YahooApi;
-import stock.recommender.api.objects.MarketExchangeSummary;
-import stock.recommender.pojo.StockRecommenderException;
+import stock.recommender.api.*;
+import stock.recommender.api.objects.MarketSummary.MarketExchange;
 import stock.recommender.util.TextUtil;
 
 import java.util.*;
@@ -21,9 +17,9 @@ public class StockRecommenderApp {
         String mainMenuOption, marketMenuOption;
         Boolean usingRealData;
         StockApi stockApi;
+        StockData stockData;
 
         Optional<String> apiKey;
-        MockData mockData;
 
         Set<String> twoOptions = new HashSet<>(Arrays.asList("1", "2"));
         Set<String> threeOptions = new HashSet<>(Arrays.asList("1", "2", "3"));
@@ -54,22 +50,18 @@ public class StockRecommenderApp {
         }
 
         while (true) {
+            stockData = new StockData(stockApi);
             mainMenuOption = queryForInput("What would you like to do?\n1) Query market data\n2) Query stock specific data\n3) Exit", threeOptions);
             if (mainMenuOption.equals("1")) {
                 while (true) {
                     marketMenuOption = queryForInput("What would you like to do?\n1) Get summary\n2) Get movers\n3) Go back", threeOptions);
                     if (marketMenuOption.equals("1")) {
-                        try {
-                            List<MarketExchangeSummary> summaries = stockApi.getMarketSummary();
-
-                            for (MarketExchangeSummary summary : summaries) {
-                                System.out.println(summary.getExchangeName());
-                                System.out.println("\t-" + summary.getRegion());
-                                System.out.println("\t-" + summary.getTimeZone());
-                                System.out.println("\t-$" + summary.getMarketPrice() + "\n");
-                            }
-                        } catch (StockRecommenderException e) {
-                            logger.warning("Failed to get market summaries. " + e.getMessage());
+                        while (true) {
+                            String marketSummarySymbol = ConsoleReader.readLine(("Enter the symbol for your desired market summary." +
+                                    "Type exit to go back: "));
+                            if (marketSummarySymbol.equalsIgnoreCase("exit")) break;
+                            MarketExchange marketExchange = stockData.getMarketExchangeSummary(marketSummarySymbol);
+                            printMarketSummary(marketExchange);
                         }
                     } else if (marketMenuOption.equals("2")) {
                         logger.info("Feature not supported. Please try again later");
@@ -86,6 +78,13 @@ public class StockRecommenderApp {
         }
     }
 
+    private static void printMarketSummary(MarketExchange summary) {
+        System.out.println(summary.getExchange());
+        System.out.println("\t-" + summary.getRegion());
+        System.out.println("\t-" + summary.getExchangeTimezoneShortName());
+        System.out.println("\t-$" + summary.getRegularMarketPrice() + "\n");
+    }
+
     private static String queryForInput(String prompt, Set<String> options) {
         while (true) {
             String input = ConsoleReader.readLine(prompt);
@@ -96,6 +95,7 @@ public class StockRecommenderApp {
             }
         }
     }
+
     private static class ConsoleReader {
         private static volatile Boolean isRunningInIde = null;
         public static String readLine (String prompt) {

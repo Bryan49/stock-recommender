@@ -1,11 +1,11 @@
 package stock.recommender.api;
 
-import stock.recommender.api.objects.MarketExchangeSummary;
+import stock.recommender.api.objects.MarketSummary.MarketExchange;
+import stock.recommender.api.objects.MarketSummary.MarketSummary;
+import stock.recommender.api.objects.MarketSummary.MarketSummaryResponse;
 import stock.recommender.pojo.StockRecommenderException;
 
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public interface StockApi {
     /**
@@ -19,8 +19,8 @@ public interface StockApi {
      * @return List The list of market exchange summaries
      * @exception StockRecommenderException Throws exception if issue occurs during get
      */
-    List<MarketExchangeSummary> getMarketSummary() throws StockRecommenderException;
+    MarketSummary getMarketSummary() throws StockRecommenderException;
 
-    Map<String,MarketExchangeSummary> getMarketSummaryBySymbol() throws StockRecommenderException;
+    Map<String, MarketExchange> getMarketSummaryBySymbol() throws StockRecommenderException;
 
 }

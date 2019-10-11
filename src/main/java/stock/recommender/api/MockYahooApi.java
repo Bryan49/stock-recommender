@@ -3,17 +3,13 @@ package stock.recommender.api;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.http.HttpStatus;
-import stock.recommender.api.objects.MarketExchangeSummary;
-import stock.recommender.api.objects.MarketSummaryResponse;
+import stock.recommender.api.objects.MarketSummary.MarketExchange;
+import stock.recommender.api.objects.MarketSummary.MarketSummary;
+import stock.recommender.api.objects.MarketSummary.MarketSummaryResponse;
+import stock.recommender.api.objects.StockHistory.StockHistory;
 import stock.recommender.pojo.StockRecommenderException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -26,7 +22,7 @@ public class MockYahooApi implements StockApi {
     public MockYahooApi() {
         this.objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true)
+                .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
                 .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
 
@@ -34,16 +30,25 @@ public class MockYahooApi implements StockApi {
         return true;
     }
 
-    public List<MarketExchangeSummary> getMarketSummary() throws StockRecommenderException {
+    public MarketSummary getMarketSummary() throws StockRecommenderException {
         try {
-            return this.objectMapper.readValue(MockData.marketSummaryResponse, MarketSummaryResponse.class).getResult();
+            return this.objectMapper.readValue(MockData.marketSummaryResponse, MarketSummary.class);
         } catch (IOException e) {
-            logger.severe("Failed to deserialize api results: " + e.getMessage());
-            return new ArrayList<>();
+            logger.severe("Failed to deserialize mock market summary: " + e.getMessage());
+            throw new StockRecommenderException("Failed to deserialize mock market summary: " + e.getMessage());
         }
     }
 
-    public Map<String, MarketExchangeSummary> getMarketSummaryBySymbol() throws StockRecommenderException {
-        return getMarketSummary().stream().collect(Collectors.toMap(MarketExchangeSummary::getSymbol, Function.identity()));
+    public Map<String, MarketExchange> getMarketSummaryBySymbol() throws StockRecommenderException {
+        return getMarketSummary().getMarketSummaryResponse().getMarketExchange().stream().collect(Collectors.toMap(MarketExchange::getSymbol, Function.identity()));
+    }
+
+    public StockHistory getStockHistory() throws StockRecommenderException {
+        try {
+            return this.objectMapper.readValue(MockData.stockHistoryResponse, StockHistory.class);
+        } catch (IOException e) {
+            logger.severe("Failed to deserialize mock stock history: " + e.getMessage());
+            throw new StockRecommenderException("Failed to deserialize mock stock history: " + e.getMessage());
+        }
     }
 }

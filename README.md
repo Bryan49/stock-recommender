@@ -9,7 +9,7 @@ Welcome to my stock recommender Java project! The final vision is still tbd.
 [Java 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## Vision
-[DONE] Create mock data for testing
+[DONE] Create mock data for testing~~~~
 
 [DONE] CLI that allows you to query for stock information
 
